@@ -141,7 +141,7 @@ def decode_polyline(polyline):
     :rtype: dict as GeoJSON
     """
     points = []
-    index = lat = lng = 0
+    index = lat = lng = elev = 0
 
     while index < len(polyline):
         result = 1
@@ -166,7 +166,24 @@ def decode_polyline(polyline):
                 break
         lng += ~(result >> 1) if (result & 1) != 0 else (result >> 1)
 
-        points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6)])
+        result = 1
+        shift = 0
+        while True:
+            b = ord(polyline[index]) - 63 - 1
+            index += 1
+            result += b << shift
+            shift += 5
+            if b < 0x1f:
+                break
+        #elev += (result >> 1) if (result & 1) != 0 else (result >> 1) 
+        delev = 0
+        if (result & 1) != 0:
+            delev = ~(result >> 1)
+        else:
+            delev = (result >> 1)
+        elev += delev 
+        
+        points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6), round(elev * 1e-5, 6)])
         geojson = {u'type': u'LineString', u'coordinates': points}
 
     return geojson
