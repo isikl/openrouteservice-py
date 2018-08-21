@@ -175,15 +175,12 @@ def decode_polyline(polyline):
             shift += 5
             if b < 0x1f:
                 break
-        #elev += (result >> 1) if (result & 1) != 0 else (result >> 1) 
-        delev = 0
         if (result & 1) != 0:
-            delev = ~(result >> 1)
+            elev += ~(result >> 1)
         else:
-            delev = (result >> 1)
-        elev += delev 
+            elev += (result >> 1) 
         
-        points.append([round(lng * 1e-5, 6), round(lat * 1e-5, 6), round(elev * 1e-5, 6)])
+        points.append({"lng": round(lng * 1e-5, 6), "lat": round(lat * 1e-5, 6), "elev": round(elev * 1e-5, 6)})
         geojson = {u'type': u'LineString', u'coordinates': points}
 
     return geojson
